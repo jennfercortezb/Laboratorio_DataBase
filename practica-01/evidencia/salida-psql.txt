@@ -1,0 +1,31 @@
+CREATE DATABASE practica1;
+CREATE DATABASE
+Ahora está conectado a la base de datos «practica1» con el usuario «postgres».
+CREATE TABLE productos (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50),
+    precio NUMERIC(10,2)
+);
+CREATE TABLE
+INSERT INTO productos (nombre, precio) VALUES
+    ('Teclado', 350.00),
+    ('Mouse', 180.50),
+    ('Monitor', 2500.00);
+INSERT 0 3
+SELECT * FROM productos;
+ id | nombre  | precio  
+----+---------+---------
+  1 | Teclado |  350.00
+  2 | Mouse   |  180.50
+  3 | Monitor | 2500.00
+(3 filas)
+
+                                  Tabla «public.productos»
+ Columna |         Tipo          | Ordenamiento | Nulable  |               Por omisi               
+---------+-----------------------+--------------+----------+---------------------------------------
+ id      | integer               |              | not null | nextval('productos_id_seq'::regclass)
+ nombre  | character varying(50) |              |          | 
+ precio  | numeric(10,2)         |              |          | 
+Índices:
+    "productos_pkey" PRIMARY KEY, btree (id)
+
