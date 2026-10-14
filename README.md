@@ -23,6 +23,7 @@ Cada práctica tiene su propia carpeta:
 | 2 | Modelo entidad-relación | [practica-02](practica-02/) |
 | 3 | Normalización y claves | [practica-03](practica-03/) |
 | 4 | SQL y DDL | [practica-04](practica-04/) |
+| 5 | Manipulación de datos (DML) | [practica-05](practica-05/) |
 
 ## Cómo ejecutar un script
 
@@ -30,7 +31,7 @@ Cada práctica tiene su propia carpeta:
 psql -U postgres -f practica-01/practica-01.sql
 ```
 
-Cada script crea su propia base (`practica1`, `practica2`, …). Si ya existe, se elimina antes con `DROP DATABASE practicaN;`.
+Las prácticas 1 a 3 crean su propia base (`practica1`, `practica2`, `practica3`). La práctica 4 crea la base `empresa`, que las prácticas 5 a 12 siguen ampliando, así que deben ejecutarse en orden a partir de la 4. Si una base ya existe, se elimina antes con `DROP DATABASE nombre;`.
 
 La evidencia de cada práctica se generó con:
 
