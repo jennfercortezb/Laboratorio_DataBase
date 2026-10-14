@@ -22,6 +22,7 @@ Cada práctica tiene su propia carpeta:
 | 1 | Introducción a las bases de datos | [practica-01](practica-01/) |
 | 2 | Modelo entidad-relación | [practica-02](practica-02/) |
 | 3 | Normalización y claves | [practica-03](practica-03/) |
+| 4 | SQL y DDL | [practica-04](practica-04/) |
 
 ## Cómo ejecutar un script
 
