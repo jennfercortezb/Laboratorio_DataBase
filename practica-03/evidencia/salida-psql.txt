@@ -1,0 +1,157 @@
+CREATE DATABASE practica3;
+CREATE DATABASE
+Ahora está conectado a la base de datos «practica3» con el usuario «postgres».
+CREATE TABLE inventario_original (
+    id                INT PRIMARY KEY,
+    producto          VARCHAR(50),
+    almacen           VARCHAR(50),
+    cantidad          INT,
+    direccion_almacen VARCHAR(100),
+    ciudad_almacen    VARCHAR(50)
+);
+CREATE TABLE
+INSERT INTO inventario_original VALUES
+    (1, 'Teclado', 'Almacén Norte', 40, 'Av. Universidad 100', 'Monterrey'),
+    (2, 'Mouse',   'Almacén Norte', 75, 'Av. Universidad 100', 'Monterrey'),
+    (3, 'Teclado', 'Almacén Sur',   15, 'Calle Hidalgo 25',    'Saltillo'),
+    (4, 'Monitor', 'Almacén Sur',    8, 'Calle Hidalgo 25',    'Saltillo'),
+    (5, 'Monitor', 'Almacén Norte', 12, 'Av. Universidad 100', 'Monterrey');
+INSERT 0 5
+SELECT almacen, direccion_almacen, ciudad_almacen, COUNT(*) AS veces_repetido
+FROM inventario_original
+GROUP BY almacen, direccion_almacen, ciudad_almacen;
+    almacen    |  direccion_almacen  | ciudad_almacen | veces_repetido 
+---------------+---------------------+----------------+----------------
+ Almacén Norte | Av. Universidad 100 | Monterrey      |              3
+ Almacén Sur   | Calle Hidalgo 25    | Saltillo       |              2
+(2 filas)
+
+CREATE TABLE almacen (
+    almacen_id SERIAL PRIMARY KEY,
+    nombre     VARCHAR(50)  NOT NULL UNIQUE,
+    direccion  VARCHAR(100) NOT NULL,
+    ciudad     VARCHAR(50)  NOT NULL
+);
+CREATE TABLE
+CREATE TABLE producto (
+    producto_id SERIAL PRIMARY KEY,
+    nombre      VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE
+CREATE TABLE inventario (
+    producto_id INT NOT NULL REFERENCES producto(producto_id),
+    almacen_id  INT NOT NULL REFERENCES almacen(almacen_id),
+    cantidad    INT NOT NULL CHECK (cantidad >= 0),
+    PRIMARY KEY (producto_id, almacen_id)
+);
+CREATE TABLE
+INSERT INTO almacen (nombre, direccion, ciudad)
+SELECT DISTINCT almacen, direccion_almacen, ciudad_almacen FROM inventario_original;
+INSERT 0 2
+INSERT INTO producto (nombre)
+SELECT DISTINCT producto FROM inventario_original;
+INSERT 0 3
+INSERT INTO inventario (producto_id, almacen_id, cantidad)
+SELECT p.producto_id, a.almacen_id, o.cantidad
+FROM inventario_original o
+JOIN producto p ON p.nombre = o.producto
+JOIN almacen  a ON a.nombre = o.almacen;
+INSERT 0 5
+SELECT p.nombre AS producto, a.nombre AS almacen, i.cantidad, a.direccion, a.ciudad
+FROM inventario i
+JOIN producto p ON p.producto_id = i.producto_id
+JOIN almacen  a ON a.almacen_id  = i.almacen_id
+ORDER BY a.nombre, p.nombre;
+ producto |    almacen    | cantidad |      direccion      |  ciudad   
+----------+---------------+----------+---------------------+-----------
+ Monitor  | Almacén Norte |       12 | Av. Universidad 100 | Monterrey
+ Mouse    | Almacén Norte |       75 | Av. Universidad 100 | Monterrey
+ Teclado  | Almacén Norte |       40 | Av. Universidad 100 | Monterrey
+ Monitor  | Almacén Sur   |        8 | Calle Hidalgo 25    | Saltillo
+ Teclado  | Almacén Sur   |       15 | Calle Hidalgo 25    | Saltillo
+(5 filas)
+
+UPDATE almacen SET direccion = 'Av. Universidad 200' WHERE nombre = 'Almacén Norte';
+UPDATE 1
+SELECT nombre, direccion FROM almacen ORDER BY nombre;
+    nombre     |      direccion      
+---------------+---------------------
+ Almacén Norte | Av. Universidad 200
+ Almacén Sur   | Calle Hidalgo 25
+(2 filas)
+
+CREATE TABLE cursos_original (
+    curso_id         INT,
+    curso_nombre     VARCHAR(50),
+    profesor         VARCHAR(50),
+    profesor_email   VARCHAR(50),
+    estudiante       VARCHAR(50),
+    estudiante_email VARCHAR(50),
+    PRIMARY KEY (curso_id, estudiante_email)
+);
+CREATE TABLE
+INSERT INTO cursos_original VALUES
+    (1, 'Bases de Datos', 'Carlos Méndez', 'cmendez@escuela.edu', 'Ana Torres',   'atorres@alumno.edu'),
+    (1, 'Bases de Datos', 'Carlos Méndez', 'cmendez@escuela.edu', 'Pedro Salas',  'psalas@alumno.edu'),
+    (2, 'Física',         'Laura Garza',   'lgarza@escuela.edu',  'Ana Torres',   'atorres@alumno.edu'),
+    (2, 'Física',         'Laura Garza',   'lgarza@escuela.edu',  'Sofía Ramos',  'sramos@alumno.edu'),
+    (3, 'Programación',   'Carlos Méndez', 'cmendez@escuela.edu', 'Pedro Salas',  'psalas@alumno.edu');
+INSERT 0 5
+CREATE TABLE profesores (
+    profesor_id    SERIAL PRIMARY KEY,
+    profesor       VARCHAR(50) NOT NULL,
+    profesor_email VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE
+CREATE TABLE estudiantes (
+    estudiante_id    SERIAL PRIMARY KEY,
+    estudiante       VARCHAR(50) NOT NULL,
+    estudiante_email VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE
+CREATE TABLE cursos (
+    curso_id     INT PRIMARY KEY,
+    curso_nombre VARCHAR(50) NOT NULL,
+    profesor_id  INT NOT NULL REFERENCES profesores(profesor_id)
+);
+CREATE TABLE
+CREATE TABLE inscripciones (
+    curso_id      INT NOT NULL REFERENCES cursos(curso_id),
+    estudiante_id INT NOT NULL REFERENCES estudiantes(estudiante_id),
+    PRIMARY KEY (curso_id, estudiante_id)
+);
+CREATE TABLE
+INSERT INTO profesores (profesor, profesor_email)
+SELECT DISTINCT profesor, profesor_email FROM cursos_original;
+INSERT 0 2
+INSERT INTO estudiantes (estudiante, estudiante_email)
+SELECT DISTINCT estudiante, estudiante_email FROM cursos_original;
+INSERT 0 3
+INSERT INTO cursos (curso_id, curso_nombre, profesor_id)
+SELECT DISTINCT o.curso_id, o.curso_nombre, p.profesor_id
+FROM cursos_original o
+JOIN profesores p ON p.profesor_email = o.profesor_email;
+INSERT 0 3
+INSERT INTO inscripciones (curso_id, estudiante_id)
+SELECT o.curso_id, e.estudiante_id
+FROM cursos_original o
+JOIN estudiantes e ON e.estudiante_email = o.estudiante_email;
+INSERT 0 5
+SELECT c.curso_id, c.curso_nombre, p.profesor, p.profesor_email, e.estudiante, e.estudiante_email
+FROM inscripciones i
+JOIN cursos      c ON c.curso_id      = i.curso_id
+JOIN profesores  p ON p.profesor_id   = c.profesor_id
+JOIN estudiantes e ON e.estudiante_id = i.estudiante_id
+ORDER BY c.curso_id, e.estudiante;
+ curso_id |  curso_nombre  |   profesor    |   profesor_email    | estudiante  |  estudiante_email  
+----------+----------------+---------------+---------------------+-------------+--------------------
+        1 | Bases de Datos | Carlos Méndez | cmendez@escuela.edu | Ana Torres  | atorres@alumno.edu
+        1 | Bases de Datos | Carlos Méndez | cmendez@escuela.edu | Pedro Salas | psalas@alumno.edu
+        2 | Física         | Laura Garza   | lgarza@escuela.edu  | Ana Torres  | atorres@alumno.edu
+        2 | Física         | Laura Garza   | lgarza@escuela.edu  | Sofía Ramos | sramos@alumno.edu
+        3 | Programación   | Carlos Méndez | cmendez@escuela.edu | Pedro Salas | psalas@alumno.edu
+(5 filas)
+
+INSERT INTO inscripciones (curso_id, estudiante_id) VALUES (1, 99);
+psql:practica-03/practica-03.sql:167: ERROR:  insert or update on table "inscripciones" violates foreign key constraint "inscripciones_estudiante_id_fkey"
+DETALLE:  Key (estudiante_id)=(99) is not present in table "estudiantes".
